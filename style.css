@@ -1,0 +1,165 @@
+/* --- 1. VARIABLES & RESET --- */
+:root {
+    --bg: #f3f4f6;
+    --card-bg: #ffffff;
+    --text: #1f2937;
+    --primary: #2563eb; /* Azul */
+    --success: #059669; /* Verde */
+    --warning: #d97706; /* Naranja */
+    --danger: #dc2626; /* Rojo */
+    --border: #e5e7eb;
+}
+
+body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; }
+
+/* --- 2. LAYOUT GENERAL --- */
+.main-container { max-width: 1200px; margin: 0 auto; }
+
+/* --- 3. HEADER INFO & ETIQUETAS --- */
+.info-panel { background: #1e293b; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+.info-title { font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #475569; padding-bottom: 5px; }
+
+.rates-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; font-size: 0.8rem; }
+.rate-card { padding: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; }
+.rate-card.special { border-left: 3px solid #60a5fa; }
+.rate-card.libre { border-left: 3px solid #f87171; }
+
+/* Etiquetas nuevas (Estaban faltando en tu CSS) */
+.limit-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin: 2px 0;
+    font-size: 0.75rem;
+}
+.cost-tag {
+    color: #fbbf24; /* Ámbar */
+    font-weight: bold;
+    font-size: 0.75rem;
+}
+
+/* --- 4. PANEL DE CONTROL (INPUTS) --- */
+.control-panel { 
+    background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; align-items: end;
+    margin-bottom: 25px; border: 1px solid var(--border);
+}
+.input-group label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 5px; color: #4b5563; }
+.input-group input, .input-group select { 
+    width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 1rem; box-sizing: border-box;
+}
+.input-group input:focus { outline: 2px solid var(--primary); border-color: transparent; }
+
+/* Indicador de Fase */
+.phase-badge { 
+    grid-column: 1 / -1; background: #e5e7eb; text-align: center; padding: 8px; 
+    border-radius: 6px; font-weight: bold; text-transform: uppercase; color: #6b7280;
+}
+.phase-soft { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+.phase-soft-plus { background: #e0e7ff; color: #3730a3; border: 1px solid #a5b4fc; }
+.phase-hard { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+/* --- 5. ESTRATEGIAS (TARJETAS) --- */
+.strategies-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+
+.card { 
+    background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.3s; opacity: 0.6; pointer-events: none;
+    display: flex; flex-direction: column;
+}
+.card.active { opacity: 1; pointer-events: auto; border-top: 5px solid var(--primary); }
+.card.active:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+
+/* Colores de Borde Superior */
+#cardRefin.active { border-top-color: #8b5cf6; } /* Violeta */
+#cardProrroga.active { border-top-color: #10b981; } /* Verde */
+#cardDescuento.active { border-top-color: #f59e0b; } /* Naranja */
+#cardVacaciones.active { border-top-color: #06b6d4; } /* Cyan */
+#cardCuotas.active { border-top-color: #3b82f6; } /* Azul */
+
+.card-header { padding: 15px; font-weight: bold; border-bottom: 1px solid var(--border); background: #f9fafb; border-radius: 10px 10px 0 0; }
+.card-body { padding: 15px; flex-grow: 1; }
+
+/* Texto y Utilidades dentro de tarjetas */
+.status-text { font-size: 0.8rem; color: #6b7280; font-style: italic; margin-bottom: 10px; }
+.money { color: var(--success); font-weight: 800; font-size: 1.2rem; }
+.calc-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.95rem; }
+.warning-note { font-size: 0.75rem; color: var(--danger); margin-top: 10px; border-top: 1px solid #fee2e2; padding-top: 5px; }
+.script { background: #eff6ff; color: #1e3a8a; padding: 10px; border-radius: 6px; font-size: 0.85rem; font-style: italic; margin-top: 10px; }
+
+.promo-box { background: #fef3c7; padding: 10px; border-radius: 6px; text-align: center; margin-bottom: 10px; }
+.highlight-text { font-size: 1.2rem; font-weight: bold; color: #d97706; }
+
+.ahorro-tag { 
+    background: var(--success); color: white; text-align: center; padding: 5px; 
+    border-radius: 20px; font-weight: bold; margin-top: 10px; font-size: 0.9rem;
+}
+
+/* --- 6. INPUTS MANUALES Y GRILLAS INTERNAS --- */
+
+/* Inputs pequeños lado a lado */
+.mini-inputs { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 0.9rem; }
+.mini-inputs input, .mini-inputs select { padding: 5px; border-radius: 4px; border: 1px solid #ccc; }
+
+/* Grilla para cálculos manuales (Prórroga y Vacaciones) */
+.manual-calc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+/* Corrección para que labels largos quepan en la grilla */
+.manual-calc-grid .mini-inputs {
+    flex-direction: column; /* Texto arriba del input */
+    align-items: flex-start;
+    gap: 4px;
+}
+.manual-calc-grid .mini-inputs label { font-size: 0.8rem; white-space: nowrap; }
+.manual-calc-grid .mini-inputs input { width: 100% !important; }
+
+
+/* Botones tipo pastilla (Pills) */
+.option-pill-group { display: flex; gap: 5px; justify-content: space-between; }
+.option-pill { 
+    background: #f3f4f6; padding: 8px; margin-bottom: 5px; border-radius: 4px; 
+    cursor: pointer; text-align: center; border: 1px solid #e5e7eb; transition: 0.2s;
+}
+.option-pill-group .option-pill { flex: 1; margin-bottom: 0; } /* Ajuste para grupos */
+.option-pill:hover { background: #e5e7eb; border-color: #9ca3af; }
+
+
+/* Cajas de Resultados */
+.result-box { background: #ecfdf5; padding: 10px; border-radius: 6px; margin-top: 10px; border: 1px solid #a7f3d0; }
+.fear-box { background: #fef2f2; padding: 10px; border-radius: 6px; margin-top: 10px; border: 1px solid #fecaca; font-size: 0.85rem; }
+
+/* Lista de Cuotas */
+.schedule-list { 
+    max-height: 150px; overflow-y: auto; background: white; border: 1px solid #e5e7eb; 
+    margin-top: 10px; border-radius: 4px; font-size: 0.85rem; 
+}
+.schedule-item { display: flex; justify-content: space-between; padding: 5px 8px; border-bottom: 1px solid #f3f4f6; }
+.schedule-item:last-child { border-bottom: none; }
+
+/* --- 7. TABLA DE REFERENCIA PRÓRROGA (CHIVATA) --- */
+.ref-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 5px;
+    margin-bottom: 5px;
+}
+.ref-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 5px;
+    text-align: center;
+    font-size: 0.75rem;
+    display: flex;
+    flex-direction: column;
+}
+.ref-item strong { color: #334155; }
+.ref-item.low { border-bottom: 2px solid #22c55e; } /* Verde - 5% */
+.ref-item.med { border-bottom: 2px solid #f59e0b; } /* Naranja - 10% */
+.ref-item.high { border-bottom: 2px solid #ef4444; } /* Rojo - 15% */

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablero de Negociación - Recobro Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="main-container">
+    
+    <header class="info-panel">
+        <div class="info-title"><i class="fas fa-info-circle"></i> Referencia de Tasas (Diarias)</div>
+        <div class="rates-grid">
+            <div class="rate-card special">
+                <strong>ESPECIAL (Todos - Bajo Riesgo)</strong><br>
+                | Monto: 100 - 2000 | Apertura 10% | Int: 1.5% | Uso: 0.3% | Mora: 4%
+            </div>
+            <div class="rate-card optimo">
+                <strong>ÓPTIMO (Nuevos)</strong><br>
+                | Monto: 100 - 1500 | Apertura 15% | Int: 1.8% | Uso: 0.3% | Mora: 4%
+            </div>
+            <div class="rate-card rentable">
+                <strong>RENTABLE (Habituales)</strong><br>
+                | Monto: 100 - 1500 | Apertura 15% | Int: 1.8% | Uso: 0.3% | Mora: 4%
+            </div>
+            <div class="rate-card libre">
+                <strong>LIBRE (Todos Alto Riesgo)</strong><br>
+                | Monto: 100 - 500 | Apertura 15% | Int: 2.5% | Uso: 0.5% | Mora: 4%
+            </div>
+        </div>
+    </header>
+
+    <section class="control-panel">
+        <div class="input-group">
+            <label>Tipo de Crédito Original</label>
+            <select id="tipoCredito" onchange="actualizarTasas()">
+                <option value="ESPECIAL">Especial</option>
+                <option value="OPTIMO">Óptimo</option>
+                <option value="RENTABLE">Rentable</option>
+                <option value="LIBRE">Libre</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>💰 Deuda Total (CRM)</label>
+            <input type="number" id="inDeuda" placeholder="0.00" oninput="calcular()">
+        </div>
+        <div class="input-group">
+            <label>🏦 Cuerpo (Capital)</label>
+            <input type="number" id="inCuerpo" placeholder="0.00" oninput="calcular()">
+        </div>
+        <div class="input-group">
+            <label>📅 Días de Atraso</label>
+            <input type="number" id="inDias" placeholder="0" oninput="calcular()">
+        </div>
+        
+        <div id="phaseDisplay" class="phase-badge">ESPERANDO DATOS...</div>
+    </section>
+
+    <div class="strategies-grid">
+
+        <div class="card" id="cardRefin">
+            <div class="card-header"><i class="fas fa-sync-alt"></i> A. Refinanciación (Nuevo Crédito)</div>
+            <div class="card-body">
+                <p class="status-text">Disponible desde día 1 (Técnicamente -5).</p>
+                <div class="promo-box">
+                    <strong>Códigos Promo Sugeridos:</strong>
+                    <div id="promoCodeDisplay" class="highlight-text">--</div>
+                </div>
+                <p class="script">"Si abona el total hoy, el sistema podría habilitarle un nuevo crédito inmediatamente con condiciones preferenciales."</p>
+            </div>
+        </div>
+
+        <div class="card" id="cardProrroga">
+            <div class="card-header"><i class="fas fa-history"></i> B. Prórroga (Extensión)</div>
+            <div class="card-body">
+                <p class="status-text">Disponible: Día -3 a 7.</p>
+                
+                <div class="ref-grid">
+                    <div class="ref-item low">
+                        <span>Hasta 7 días</span>
+                        <strong>Min 5%</strong>
+                    </div>
+                    <div class="ref-item med">
+                        <span>8 a 10 días</span>
+                        <strong>Min 10%</strong>
+                    </div>
+                    <div class="ref-item high">
+                        <span>11 a 15 días</span>
+                        <strong>Min 15%</strong>
+                    </div>
+                </div>
+
+                <p style="font-size: 0.8rem; color: #64748b; margin: 5px 0 10px 0; text-align: center;">
+                    <em>*Estrategia: Ofrece 15% y baja hasta el Mínimo permitido.</em>
+                </p>
+
+                <hr style="border-color: #f1f5f9; margin: 10px 0;">
+
+                <div class="manual-calc-grid">
+                    <div class="mini-inputs">
+                        <label>Días Extra (Manual):</label>
+                        <input type="number" id="proDias" value="7" oninput="calcularProrroga()">
+                    </div>
+                    <div class="mini-inputs">
+                        <label>% a Cobrar:</label>
+                        <input type="number" id="proPorc" value="15" oninput="calcularProrroga()">
+                    </div>
+                </div>
+
+                <div id="proWarning" class="warning-note" style="display:none; background: #fffbeb; border: 1px solid #fcd34d; color: #b45309; padding: 8px; font-size: 0.85rem; margin-bottom: 10px;">
+                    </div>
+
+                <div class="result-box" style="background: #f0fdf4; border-color: #bbf7d0;">
+                    
+                    <div class="row">
+                        <span>1. Pagar HOY:</span>
+                        <strong class="money" id="proPagoHoy">€0.00</strong>
+                    </div>
+
+                    <hr style="border-top: 1px dashed #86efac; margin: 8px 0;">
+
+                    <div style="display: grid; grid-template-columns: 1fr 1px 1fr; gap: 10px; text-align: center; align-items: center;">
+                        
+                        <div>
+                            <span style="font-size: 0.75rem; color: #166534; font-weight: bold;">CON PRÓRROGA</span>
+                            <div style="font-size: 0.7rem; color: #6b7280;">(Saldo + 20% Castigo)</div>
+                            <div id="proNuevoTotal" style="font-size: 1.1rem; font-weight: bold; color: #166534;">€0.00</div>
+                        </div>
+
+                        <div style="background: #bbf7d0; height: 100%; width: 1px;"></div>
+
+                        <div>
+                            <span style="font-size: 0.75rem; color: #dc2626; font-weight: bold;">SIN HACER NADA</span>
+                            <div style="font-size: 0.7rem; color: #6b7280;">(Mora acumulada)</div>
+                            <div id="proProyeccion" style="font-size: 1.1rem; font-weight: bold; color: #dc2626;">€0.00</div>
+                        </div>
+
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 8px; background: white; padding: 4px; border-radius: 4px; border: 1px solid #bbf7d0; font-size: 0.8rem;">
+                        💡 Evitas crecer la deuda en: <strong id="proDiferencia" style="color: #059669">€0.00</strong>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="cardDescuento">
+            <div class="card-header"><i class="fas fa-percentage"></i> C. Descuento / Liquidación</div>
+            <div class="card-body">
+                <p class="status-text">Liquidar deuda hoy.</p>
+                
+                <div id="descSoft" style="display:none;">
+                    <p class="sub-label">Soft (1-15 días): % sobre Cargos (Total - Cuerpo)</p>
+                    <div class="calc-row"><span>10% Dto:</span> <strong id="dSoft10">€0.00</strong> (Paga)</div>
+                    <div class="calc-row"><span>12% Dto:</span> <strong id="dSoft12">€0.00</strong> (Paga)</div>
+                    <div class="calc-row"><span>15% Dto:</span> <strong id="dSoft15" class="money">€0.00</strong> (Paga)</div>
+                    <p class="note">Más de 15% requiere Supervisor.</p>
+                </div>
+
+                <div id="descHard" style="display:none;">
+                    <p class="sub-label">Política Multiplicador de Cuerpo</p>
+                    <div class="calc-row"><span>Oferta Inicial (2x):</span> <strong id="dHardStart">€0.00</strong></div>
+                    <div class="calc-row"><span>Mínimo (<span id="factorLabel">1.4</span>x):</span> <strong id="dHardMin" class="money">€0.00</strong></div>
+                    <p class="note" id="descHardNote"></p>
+                </div>
+                <div class="ahorro-tag" id="ahorroDisplay">Ahorro: €0.00</div>
+            </div>
+        </div>
+
+        <div class="card" id="cardVacaciones">
+            <div class="card-header"><i class="fas fa-umbrella-beach"></i> D. Vacaciones Financieras</div>
+            <div class="card-body">
+                <p class="status-text">Disponible desde Día 8 (Congela deuda).</p>
+                
+                <div class="option-pill-group">
+                    <button class="option-pill" onclick="setVacacionesPreset(30, 3)">30% (3d)</button>
+                    <button class="option-pill" onclick="setVacacionesPreset(40, 5)">40% (5d)</button>
+                    <button class="option-pill" onclick="setVacacionesPreset(50, 7)">50% (7d)</button>
+                </div>
+
+                <hr style="border-color: #e5e7eb; margin: 15px 0;">
+
+                <div class="manual-calc-grid">
+                    <div class="mini-inputs">
+                        <label>Cliente tiene (€):</label>
+                        <input type="number" id="vacMontoUser" placeholder="0" oninput="calcVacacionesFromMonto()">
+                    </div>
+                    <div class="mini-inputs">
+                        <label>Equivale a (%):</label>
+                        <input type="number" id="vacPorcUser" placeholder="0" oninput="calcVacacionesFromPorc()">
+                    </div>
+                </div>
+
+                <div class="mini-inputs">
+                    <label>Días a Congelar:</label>
+                    <input type="number" id="vacDiasSelect" value="3" min="1" max="10" oninput="calcVacacionesFinal()">
+                </div>
+
+                <div class="result-box">
+                    <div class="row">Pago Inicial HOY: <strong id="vacPago" class="money">€0.00</strong></div>
+                    <div class="row">Saldo Restante: <strong id="vacRestante">€0.00</strong></div>
+                    <div class="row" style="font-size: 0.8rem; color: #6b7280;">(A pagar al volver de las vacaciones)</div>
+                </div>
+
+                <div id="vacWarning" class="warning-note" style="display:none; color: #d97706;">
+                    ⚠️ El monto es insuficiente para los días pedidos (Regla: 30%=3d, 40%=5d, 50%=7d).
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="cardCuotas">
+            <div class="card-header"><i class="fas fa-handshake"></i> E. Plan de Pagos</div>
+            <div class="card-body">
+                <p class="status-text">Disponible: Soft+ (Día 16+). <br><small>Excepcional: Día 8. Supervisor: Día 1.</small></p>
+                
+                <div class="calc-row">
+                    <span>Entrada (<span id="cuotaPorc">100</span>%):</span>
+                    <strong class="money" id="cuotaEntrada">€0.00</strong>
+                </div>
+                <div class="calc-row"><span>Saldo a Financiar:</span> <strong id="cuotaSaldo">€0.00</strong></div>
+
+                <hr>
+                <div class="mini-inputs">
+                    <label>Frecuencia:</label>
+                    <select id="cuotaFreq" onchange="calcularCuotas()">
+                        <option value="15">Quincenal (Cada 15 días)</option>
+                        <option value="30">Mensual (Cada 30 días)</option>
+                    </select>
+                </div>
+                <div class="mini-inputs">
+                    <label>Cant. Cuotas:</label>
+                    <input type="number" id="cuotaCant" value="2" min="1" max="6" oninput="calcularCuotas()">
+                </div>
+
+                <div id="scheduleTable" class="schedule-list">
+                    </div>
+                
+                <p class="warning-note">Si falla: Deuda vuelve a Total + Cargos. (Min 2x cuerpos Soft+/Hard).</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
