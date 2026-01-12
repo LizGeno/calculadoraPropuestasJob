@@ -33,7 +33,7 @@ function calcular() {
     
     // Ejecutar submódulos
     calcRefinanciacion();
-    calcularProrroga(); // Lógica Prórroga
+    calcProFromPorc(); // Lógica Prórroga
     calcDescuentos();
     // Vacaciones se calcula al clicar, pero reseteamos valores
     document.getElementById('vacPago').innerText = '€0.00';
@@ -105,15 +105,59 @@ function calcRefinanciacion() {
     document.getElementById('promoCodeDisplay').innerText = code;
 }
 
-// --- B. PRÓRROGA ---
-function calcularProrroga() {
+// --- B. PRÓRROGA (LÓGICA COMPLETA: FECHA + INVERSA + CRM) ---
+
+// 1. Si el usuario escribe MONTOS (€) -> Calculamos %
+function calcProFromMonto() {
+    if (state.cuerpo === 0) return;
+    const montoUser = parseFloat(document.getElementById('proMontoUser').value) || 0;
+    
+    // Regla de 3: (Monto / Cuerpo) * 100 = Porcentaje
+    const porc = (montoUser / state.cuerpo) * 100;
+    
+    // Actualizamos el input de porcentaje (con 1 decimal)
+    document.getElementById('proPorc').value = porc.toFixed(1);
+    
+    calcularProrrogaFinal();
+}
+
+// 2. Si el usuario escribe PORCENTAJE (%) -> Calculamos €
+function calcProFromPorc() {
+    if (state.cuerpo === 0) return;
+    const porcUser = parseFloat(document.getElementById('proPorc').value) || 0;
+    
+    // Calculamos monto: Cuerpo * (Porcentaje / 100)
+    const monto = state.cuerpo * (porcUser / 100);
+    
+    // Actualizamos el input de monto
+    document.getElementById('proMontoUser').value = monto.toFixed(2);
+    
+    calcularProrrogaFinal();
+}
+
+// 3. CÁLCULO MAESTRO
+function calcularProrrogaFinal() {
     if (state.deuda === 0 || state.cuerpo === 0) return;
 
-    // 1. Inputs
+    // --- A. OBTENER DATOS ---
     const diasExtra = parseInt(document.getElementById('proDias').value) || 0;
     const porc = parseFloat(document.getElementById('proPorc').value) || 0;
+    
+    // Si llegamos aquí sin haber calculado el monto (ej. cambio de días), recalculamos el monto visual
+    const pagoHoy = state.cuerpo * (porc / 100);
+    // Solo actualizamos el input visual si no tiene el foco (para no molestar al escribir)
+    if (document.activeElement.id !== 'proMontoUser') {
+        document.getElementById('proMontoUser').value = pagoHoy.toFixed(2);
+    }
 
-    // 2. Validación Semáforo (Igual que antes)
+    // --- B. CALCULAR FECHA DE VENCIMIENTO ---
+    // Fecha Hoy + Días Extra
+    const fechaVenc = new Date();
+    fechaVenc.setDate(fechaVenc.getDate() + diasExtra);
+    const opcionesFecha = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    document.getElementById('proFechaVenc').innerText = fechaVenc.toLocaleDateString('es-ES', opcionesFecha);
+
+    // --- C. VALIDACIÓN SEMÁFORO ---
     const warningBox = document.getElementById('proWarning');
     let minPorcPermitido = (diasExtra <= 7) ? 5 : (diasExtra <= 10 ? 10 : 15);
 
@@ -124,60 +168,38 @@ function calcularProrroga() {
         warningBox.style.display = 'none';
     }
 
-    // --- ESCENARIO A: TOMA LA PRÓRROGA ---
-    const pagoHoy = state.cuerpo * (porc / 100);
-    
+    // --- D. ESCENARIO REAL (CON PRÓRROGA) ---
     // Su deuda baja momentáneamente
     let saldoRestante = state.deuda - pagoHoy;
     if (saldoRestante < 0) saldoRestante = 0;
 
-    // Se le aplica el castigo único del 20%
+    // Penalización del 20% al saldo pendiente
     const penalizacion = saldoRestante * 0.20;
     const deudaFinalConProrroga = saldoRestante + penalizacion;
 
-
-    // --- ESCENARIO B: NO HACE NADA (Proyección del Terror) ---
-    // Calculamos cómo crece la deuda actual día a día con Mora + Intereses
+    // --- E. ESCENARIO MIEDO (SIN HACER NADA - Proyección CRM) ---
+    // Interés Simple sobre el Cuerpo
     let deudaProyectada = state.deuda;
-    const tasa = TASAS[state.tipo]; // Obtenemos las tasas del plan seleccionado
-    const topeLegal = state.cuerpo * 2; // El límite legal de penalizaciones
+    const tasa = TASAS[state.tipo]; 
     
-    for (let i = 0; i < diasExtra; i++) {
-        // Interés normal + Uso (Esto sigue corriendo)
-        // Nota: Se calcula sobre el CUERPO original usualmente
-        const interesDiario = state.cuerpo * (tasa.int + tasa.uso);
-        
-        // Mora diaria (4% sobre lo que debe)
-        const moraDiaria = deudaProyectada * tasa.mora;
+    // Costo Diario = Cuerpo * (%Interés + %Uso + %Mora)
+    const porcentajeDiarioTotal = tasa.int + tasa.uso + tasa.mora;
+    const costoPorDia = state.cuerpo * porcentajeDiarioTotal;
+    
+    // Proyección Lineal
+    const costoAcumuladoFuturo = costoPorDia * diasExtra;
+    deudaProyectada += costoAcumuladoFuturo;
 
-        // Validamos Topes (Solo sumamos si no ha pasado el tope legal de penalizaciones)
-        // Simplificación: Asumimos que "Intereses" siempre suman, "Mora" tiene tope.
-        const penalizacionesAcumuladas = deudaProyectada - state.cuerpo;
-        
-        // Sumamos intereses normales
-        deudaProyectada += interesDiario;
-
-        // Sumamos Mora si no explotó el tope
-        if (penalizacionesAcumuladas + moraDiaria < topeLegal) {
-            deudaProyectada += moraDiaria;
-        }
-    }
-
-    // --- RENDERIZADO ---
+    // --- F. RENDERIZADO ---
     document.getElementById('proPagoHoy').innerText = fmt(pagoHoy);
-    
-    // Comparativa
     document.getElementById('proNuevoTotal').innerText = fmt(deudaFinalConProrroga);
     document.getElementById('proProyeccion').innerText = fmt(deudaProyectada);
 
     // Diferencia (Ahorro)
-    // Si la proyección es peor que la prórroga, el ahorro es positivo
     let diferencia = deudaProyectada - deudaFinalConProrroga;
-    if (diferencia < 0) diferencia = 0; // Por si acaso
-
+    if (diferencia < 0) diferencia = 0; 
     document.getElementById('proDiferencia').innerText = fmt(diferencia);
 }
-
 
 // --- C. DESCUENTO ---
 function calcDescuentos() {
@@ -388,6 +410,10 @@ function calcularCuotas() {
 
     list.innerHTML = html;
 }
+
+
+
+
 
 // Inicializar
 window.onload = () => {

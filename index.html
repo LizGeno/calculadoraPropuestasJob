@@ -59,6 +59,8 @@
         <div id="phaseDisplay" class="phase-badge">ESPERANDO DATOS...</div>
     </section>
 
+    
+
     <div class="strategies-grid">
 
         <div class="card" id="cardRefin">
@@ -76,42 +78,41 @@
         <div class="card" id="cardProrroga">
             <div class="card-header"><i class="fas fa-history"></i> B. Prórroga (Extensión)</div>
             <div class="card-body">
-                <p class="status-text">Disponible: Día -3 a 7.</p>
+                <p class="status-text">Disponible: Día -3 a 7. (Congela penalizaciones).</p>
                 
                 <div class="ref-grid">
-                    <div class="ref-item low">
-                        <span>Hasta 7 días</span>
-                        <strong>Min 5%</strong>
-                    </div>
-                    <div class="ref-item med">
-                        <span>8 a 10 días</span>
-                        <strong>Min 10%</strong>
-                    </div>
-                    <div class="ref-item high">
-                        <span>11 a 15 días</span>
-                        <strong>Min 15%</strong>
-                    </div>
+                    <div class="ref-item low"><span>Hasta 7 días</span><strong>Min 5%</strong></div>
+                    <div class="ref-item med"><span>8 a 10 días</span><strong>Min 10%</strong></div>
+                    <div class="ref-item high"><span>11 a 15 días</span><strong>Min 15%</strong></div>
                 </div>
-
-                <p style="font-size: 0.8rem; color: #64748b; margin: 5px 0 10px 0; text-align: center;">
-                    <em>*Estrategia: Ofrece 15% y baja hasta el Mínimo permitido.</em>
-                </p>
 
                 <hr style="border-color: #f1f5f9; margin: 10px 0;">
 
                 <div class="manual-calc-grid">
                     <div class="mini-inputs">
-                        <label>Días Extra (Manual):</label>
-                        <input type="number" id="proDias" value="7" oninput="calcularProrroga()">
+                        <label>Días Extra:</label>
+                        <input type="number" id="proDias" value="7" oninput="calcularProrrogaFinal()">
                     </div>
                     <div class="mini-inputs">
-                        <label>% a Cobrar:</label>
-                        <input type="number" id="proPorc" value="15" oninput="calcularProrroga()">
+                        <label>Nueva Fecha:</label>
+                        <div id="proFechaVenc" style="background:#f1f5f9; padding:5px; border-radius:4px; border:1px solid #ccc; width:100%; text-align:center; font-weight:bold; color:#2563eb;">
+                            --/--/--
+                        </div>
                     </div>
                 </div>
 
-                <div id="proWarning" class="warning-note" style="display:none; background: #fffbeb; border: 1px solid #fcd34d; color: #b45309; padding: 8px; font-size: 0.85rem; margin-bottom: 10px;">
+                <div class="manual-calc-grid">
+                    <div class="mini-inputs">
+                        <label>Cliente tiene (€):</label>
+                        <input type="number" id="proMontoUser" placeholder="0" oninput="calcProFromMonto()">
                     </div>
+                    <div class="mini-inputs">
+                        <label>Equivale a (%):</label>
+                        <input type="number" id="proPorc" value="15" oninput="calcProFromPorc()">
+                    </div>
+                </div>
+
+                <div id="proWarning" class="warning-note" style="display:none; background: #fffbeb; border: 1px solid #fcd34d; color: #b45309; padding: 8px; font-size: 0.85rem; margin-bottom: 10px;"></div>
 
                 <div class="result-box" style="background: #f0fdf4; border-color: #bbf7d0;">
                     
@@ -134,7 +135,7 @@
 
                         <div>
                             <span style="font-size: 0.75rem; color: #dc2626; font-weight: bold;">SIN HACER NADA</span>
-                            <div style="font-size: 0.7rem; color: #6b7280;">(Mora acumulada)</div>
+                            <div style="font-size: 0.7rem; color: #6b7280;">(Proyección CRM)</div>
                             <div id="proProyeccion" style="font-size: 1.1rem; font-weight: bold; color: #dc2626;">€0.00</div>
                         </div>
 
