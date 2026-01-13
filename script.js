@@ -201,63 +201,37 @@ function calcularProrrogaFinal() {
     document.getElementById('proDiferencia').innerText = fmt(diferencia);
 }
 
-// --- C. DESCUENTO ---
+// --- C. DESCUENTO (VISUALIZACIÓN TOTAL) ---
 function calcDescuentos() {
-    // Si no hay datos, no hacemos nada
     if (state.deuda === 0 || state.cuerpo === 0) return;
 
     const cargos = state.deuda - state.cuerpo;
-    const boxSoft = document.getElementById('descSoft');
-    const boxHard = document.getElementById('descHard');
-    const ahorroLabel = document.getElementById('ahorroDisplay');
+    
+    // 1. CÁLCULO SOFT (Siempre visible)
+    // Cuerpo + % de cargos restante
+    const pago10 = state.cuerpo + (cargos * 0.90);
+    const pago12 = state.cuerpo + (cargos * 0.88);
+    const pago15 = state.cuerpo + (cargos * 0.85);
 
-    if (state.fase === 'SOFT') {
-        // --- LÓGICA SOFT (1-15 Días) ---
-        boxSoft.style.display = 'block';
-        boxHard.style.display = 'none';
+    document.getElementById('dSoft10').innerText = fmt(pago10);
+    document.getElementById('dSoft12').innerText = fmt(pago12);
+    document.getElementById('dSoft15').innerText = fmt(pago15);
 
-        // Fórmula: Cuerpo + (Cargos con descuento)
-        const pago10 = state.cuerpo + (cargos * 0.90); // Descuenta 10% de cargos
-        const pago12 = state.cuerpo + (cargos * 0.88); // Descuenta 12% de cargos
-        const pago15 = state.cuerpo + (cargos * 0.85); // Descuenta 15% de cargos
+    // 2. CÁLCULO SOFT+ (Siempre visible)
+    // Min 1.4 x Cuerpo
+    let softPlusVal = state.cuerpo * 1.4;
+    if (softPlusVal > state.deuda) softPlusVal = state.deuda; // Tope deuda real
+    document.getElementById('dSoftPlus').innerText = fmt(softPlusVal);
 
-        document.getElementById('dSoft10').innerText = fmt(pago10);
-        document.getElementById('dSoft12').innerText = fmt(pago12);
-        document.getElementById('dSoft15').innerText = fmt(pago15);
-        
-        const ahorro = state.deuda - pago15;
-        ahorroLabel.innerText = "Ahorro Máx: " + fmt(ahorro);
+    // 3. CÁLCULO HARD (Siempre visible)
+    // Min 1.2 x Cuerpo
+    let hardVal = state.cuerpo * 1.2;
+    if (hardVal > state.deuda) hardVal = state.deuda; // Tope deuda real
+    document.getElementById('dHard').innerText = fmt(hardVal);
 
-    } else {
-        // --- LÓGICA HARD / SOFT+ (+16 Días) ---
-        boxSoft.style.display = 'none';
-        boxHard.style.display = 'block';
-
-        let factorMin = 1.4;
-        let note = "Soft+: Min 1.4 cuerpos";
-        
-        if (state.fase === 'HARD') {
-            factorMin = 1.2;
-            note = "Hard: Min 1.2 cuerpos (Prioridad)";
-        }
-
-        // 1. Oferta Inicial (El PDF dice '2 cuerpos', pero no puede ser mayor a la deuda real)
-        let offerStart = state.cuerpo * 2;
-        if (offerStart > state.deuda) offerStart = state.deuda;
-
-        // 2. Oferta Mínima (El piso de la negociación)
-        let offerMin = state.cuerpo * factorMin;
-        // Seguridad: Si la oferta Min es mayor que la deuda actual, mostramos deuda
-        if (offerMin > state.deuda) offerMin = state.deuda;
-
-        document.getElementById('dHardStart').innerText = fmt(offerStart);
-        document.getElementById('dHardMin').innerText = fmt(offerMin);
-        document.getElementById('factorLabel').innerText = factorMin;
-        document.getElementById('descHardNote').innerText = note;
-        
-        const ahorro = state.deuda - offerMin;
-        ahorroLabel.innerText = "Ahorro Máx: " + fmt(ahorro);
-    }
+    // Calcular ahorro máximo posible (usando la opción Hard como referencia extrema)
+    const ahorroMax = state.deuda - hardVal;
+    document.getElementById('ahorroDisplay').innerText = "Ahorro Máx Potencial: " + fmt(ahorroMax);
 }
 
 // --- D. VACACIONES FINANCIERAS ---
@@ -339,68 +313,76 @@ function getMinPorc(dias) {
     return 30;
 }
 
-// --- E. CUOTAS ---
+// --- E. CUOTAS (TODAS LAS OPCIONES + SEMANAL) ---
 function calcularCuotas() {
+    if (state.deuda === 0 || state.cuerpo === 0) return;
+
     const list = document.getElementById('scheduleTable');
     list.innerHTML = '';
-    
-    if (state.deuda === 0) return;
 
-    // 1. Determinar Entrada Mínima según fase
-    let factorEntrada = 1.0; // Soft Default
-    let minEntradaNominal = 50;
+    // 1. CALCULAR TODAS LAS ENTRADAS POSIBLES
+    let entSoft = state.cuerpo * 1.0; 
+    if (entSoft < 50) entSoft = 50; // Mínimo 50€ regla Soft
+    if (entSoft > state.deuda) entSoft = state.deuda;
 
-    if (state.fase === 'SOFT+') factorEntrada = 0.70;
-    if (state.fase === 'HARD') factorEntrada = 0.50;
+    let entSoftPlus = state.cuerpo * 0.70;
+    if (entSoftPlus > state.deuda) entSoftPlus = state.deuda;
 
-    let entrada = state.cuerpo * factorEntrada;
+    let entHard = state.cuerpo * 0.50;
+    if (entHard > state.deuda) entHard = state.deuda;
+
+    // Mostrar en las tarjetas superiores
+    document.getElementById('entrySoft').innerText = fmt(entSoft);
+    document.getElementById('entrySoftPlus').innerText = fmt(entSoftPlus);
+    document.getElementById('entryHard').innerText = fmt(entHard);
+
+    // 2. DETERMINAR ENTRADA ACTIVA PARA EL CALENDARIO
+    // Basado en lo que el usuario elija en el selector "Usar Entrada de:"
+    const baseSeleccionada = document.getElementById('cuotaBaseSelector').value;
+    let entradaFinal = 0;
+
+    if (baseSeleccionada === 'SOFT') entradaFinal = entSoft;
+    else if (baseSeleccionada === 'SOFT+') entradaFinal = entSoftPlus;
+    else if (baseSeleccionada === 'HARD') entradaFinal = entHard;
+
+    document.getElementById('cuotaEntradaFinal').innerText = fmt(entradaFinal);
     
-    // Regla Soft: bajar hasta 50 eur min
-    if (state.fase === 'SOFT' && entrada < 50) entrada = 50;
-    
-    // Input visual
-    document.getElementById('cuotaPorc').innerText = (factorEntrada * 100);
-    document.getElementById('cuotaEntrada').innerText = fmt(entrada);
-    
-    const saldoFinanciar = state.deuda - entrada;
-    document.getElementById('cuotaSaldo').innerText = fmt(saldoFinanciar);
+    const saldoFinanciar = state.deuda - entradaFinal;
+    document.getElementById('cuotaSaldoFinal').innerText = fmt(saldoFinanciar);
 
     if (saldoFinanciar <= 0) {
-        list.innerHTML = '<div style="padding:10px; color:green">La entrada cubre la deuda.</div>';
+        list.innerHTML = '<div style="padding:10px; color:green; text-align:center;">La entrada cubre el total de la deuda.</div>';
         return;
     }
 
-    // 2. Generar Calendario
+    // 3. GENERAR CALENDARIO
     const freq = parseInt(document.getElementById('cuotaFreq').value);
     let cant = parseInt(document.getElementById('cuotaCant').value);
 
-    // Validar Restricciones
-    // 30 dias max 3 cuotas
-    if (freq === 30 && cant > 3) {
-        cant = 3; 
-        document.getElementById('cuotaCant').value = 3;
-        alert("Máximo 3 cuotas para plazos mensuales.");
+    // Validaciones de frecuencia (puedes ajustar los máximos a tu gusto)
+    if (freq === 30 && cant > 3) { // Mensual max 3
+        alert("Para mensual, máximo 3 cuotas.");
+        cant = 3; document.getElementById('cuotaCant').value = 3;
     }
-    // 15 dias max 6 cuotas
-    if (freq === 15 && cant > 6) {
-        cant = 6;
-        document.getElementById('cuotaCant').value = 6;
+    if (freq === 15 && cant > 6) { // Quincenal max 6
+        cant = 6; document.getElementById('cuotaCant').value = 6;
+    }
+    if (freq === 7 && cant > 12) { // Semanal max 12 (ejemplo)
+        cant = 12; document.getElementById('cuotaCant').value = 12;
     }
 
     const montoCuota = saldoFinanciar / cant;
     const hoy = new Date();
 
     let html = '';
-    
-    // Fila Entrada
-    html += `<div class="schedule-item" style="background:#eff6ff; font-weight:bold">
-                <span>HOY (Entrada)</span> <span>${fmt(entrada)}</span>
+    // Fila Entrada (Hoy)
+    html += `<div class="schedule-item" style="background:#eff6ff; font-weight:bold; border-left: 4px solid #3b82f6;">
+                <span>HOY (Entrada ${baseSeleccionada})</span> <span>${fmt(entradaFinal)}</span>
              </div>`;
 
     for (let i = 1; i <= cant; i++) {
         const fechaPago = new Date();
         fechaPago.setDate(hoy.getDate() + (i * freq));
-        
         const fechaStr = fechaPago.toLocaleDateString('es-ES', {day: '2-digit', month: '2-digit'});
         
         html += `<div class="schedule-item">
@@ -410,8 +392,6 @@ function calcularCuotas() {
 
     list.innerHTML = html;
 }
-
-
 
 
 

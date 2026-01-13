@@ -165,3 +165,49 @@ body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--
 .ref-item.high { border-bottom: 2px solid #ef4444; } /* Rojo - 15% */
 
 
+/* --- ESTILOS NUEVOS PARA VISTAS COMPARATIVAS --- */
+
+/* Contenedor Descuentos */
+.comparison-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.option-box {
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 10px;
+    background: #f8fafc;
+}
+
+/* Colores sutiles para diferenciar fases */
+.soft-style { border-left: 4px solid #60a5fa; }
+.softplus-style { border-left: 4px solid #818cf8; }
+.hard-style { border-left: 4px solid #f87171; }
+
+.opt-title { font-size: 0.75rem; font-weight: bold; text-transform: uppercase; color: #475569; margin-bottom: 2px; }
+.opt-desc { font-size: 0.7rem; color: #64748b; font-style: italic; margin-bottom: 5px; }
+.opt-note { font-size: 0.7rem; color: #94a3b8; text-align: center; margin-top: 2px; }
+
+.calc-row-sm { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 2px; }
+.calc-row-center { text-align: center; font-size: 0.9rem; }
+.highlight-val { color: #059669; font-weight: 800; }
+
+/* Grilla de Entradas (Cuotas) */
+.comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+}
+.entry-card {
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 8px 4px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+.entry-card span { font-size: 0.65rem; font-weight: bold; color: #64748b; }
+.entry-card strong { font-size: 0.9rem; color: #1e293b; }

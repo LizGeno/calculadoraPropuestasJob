@@ -152,23 +152,39 @@
         <div class="card" id="cardDescuento">
             <div class="card-header"><i class="fas fa-percentage"></i> C. Descuento / Liquidación</div>
             <div class="card-body">
-                <p class="status-text">Liquidar deuda hoy.</p>
+                <p class="status-text">Opciones de Liquidación Total según Fase:</p>
                 
-                <div id="descSoft" style="display:none;">
-                    <p class="sub-label">Soft (1-15 días): % sobre Cargos (Total - Cuerpo)</p>
-                    <div class="calc-row"><span>10% Dto:</span> <strong id="dSoft10">€0.00</strong> (Paga)</div>
-                    <div class="calc-row"><span>12% Dto:</span> <strong id="dSoft12">€0.00</strong> (Paga)</div>
-                    <div class="calc-row"><span>15% Dto:</span> <strong id="dSoft15" class="money">€0.00</strong> (Paga)</div>
-                    <p class="note">Más de 15% requiere Supervisor.</p>
+                <div class="comparison-container">
+                    
+                    <div class="option-box soft-style">
+                        <div class="opt-title">FASE SOFT (1-15 d)</div>
+                        <div class="opt-desc">Cuerpo + % de Cargos</div>
+                        <div class="calc-row-sm">10% Dto: <strong id="dSoft10">€0.00</strong></div>
+                        <div class="calc-row-sm">12% Dto: <strong id="dSoft12">€0.00</strong></div>
+                        <div class="calc-row-sm">15% Dto: <strong id="dSoft15" class="highlight-val">€0.00</strong></div>
+                    </div>
+
+                    <div class="option-box softplus-style">
+                        <div class="opt-title">FASE SOFT+ (16-35 d)</div>
+                        <div class="opt-desc">Mínimo: 1.4 x Cuerpo</div>
+                        <div class="calc-row-center">
+                            A Pagar: <strong id="dSoftPlus" class="highlight-val">€0.00</strong>
+                        </div>
+                        <div class="opt-note">(Cuerpo x 1.4)</div>
+                    </div>
+
+                    <div class="option-box hard-style">
+                        <div class="opt-title">FASE HARD (35+ d)</div>
+                        <div class="opt-desc">Mínimo: 1.2 x Cuerpo</div>
+                        <div class="calc-row-center">
+                            A Pagar: <strong id="dHard" class="highlight-val">€0.00</strong>
+                        </div>
+                        <div class="opt-note">(Cuerpo x 1.2)</div>
+                    </div>
+
                 </div>
 
-                <div id="descHard" style="display:none;">
-                    <p class="sub-label">Política Multiplicador de Cuerpo</p>
-                    <div class="calc-row"><span>Oferta Inicial (2x):</span> <strong id="dHardStart">€0.00</strong></div>
-                    <div class="calc-row"><span>Mínimo (<span id="factorLabel">1.4</span>x):</span> <strong id="dHardMin" class="money">€0.00</strong></div>
-                    <p class="note" id="descHardNote"></p>
-                </div>
-                <div class="ahorro-tag" id="ahorroDisplay">Ahorro: €0.00</div>
+                <div class="ahorro-tag" id="ahorroDisplay">Ahorro Máximo posible: €0.00</div>
             </div>
         </div>
 
@@ -214,38 +230,61 @@
         </div>
 
         <div class="card" id="cardCuotas">
-            <div class="card-header"><i class="fas fa-handshake"></i> E. Plan de Pagos</div>
+            <div class="card-header"><i class="fas fa-handshake"></i> E. Plan de Pagos (Reestructuración)</div>
             <div class="card-body">
-                <p class="status-text">Disponible: Soft+ (Día 16+). <br><small>Excepcional: Día 8. Supervisor: Día 1.</small></p>
+                <p class="status-text">Entrada requerida para activar plan:</p>
                 
-                <div class="calc-row">
-                    <span>Entrada (<span id="cuotaPorc">100</span>%):</span>
-                    <strong class="money" id="cuotaEntrada">€0.00</strong>
+                <div class="comparison-grid">
+                    <div class="entry-card">
+                        <span>SOFT (100%)</span>
+                        <strong id="entrySoft">€0.00</strong>
+                    </div>
+                    <div class="entry-card">
+                        <span>SOFT+ (70%)</span>
+                        <strong id="entrySoftPlus">€0.00</strong>
+                    </div>
+                    <div class="entry-card">
+                        <span>HARD (50%)</span>
+                        <strong id="entryHard">€0.00</strong>
+                    </div>
                 </div>
-                <div class="calc-row"><span>Saldo a Financiar:</span> <strong id="cuotaSaldo">€0.00</strong></div>
+                <p class="warning-note" style="margin-top:5px; margin-bottom:15px; border:none; color:#64748b;">
+                    *Nota: En Soft mín 50€. El resto se financia.
+                </p>
 
-                <hr>
+                <hr style="border-color: #e5e7eb;">
+
                 <div class="mini-inputs">
                     <label>Frecuencia:</label>
                     <select id="cuotaFreq" onchange="calcularCuotas()">
-                        <option value="15">Quincenal (Cada 15 días)</option>
+                        <option value="7">Semanal (Cada 7 días)</option>
+                        <option value="15" selected>Quincenal (Cada 15 días)</option>
                         <option value="30">Mensual (Cada 30 días)</option>
                     </select>
                 </div>
                 <div class="mini-inputs">
                     <label>Cant. Cuotas:</label>
-                    <input type="number" id="cuotaCant" value="2" min="1" max="6" oninput="calcularCuotas()">
+                    <input type="number" id="cuotaCant" value="2" min="1" max="12" oninput="calcularCuotas()">
+                </div>
+                
+                <div class="mini-inputs">
+                    <label>Usar Entrada de:</label>
+                    <select id="cuotaBaseSelector" onchange="calcularCuotas()">
+                        <option value="SOFT">Soft (100% Cuerpo)</option>
+                        <option value="SOFT+">Soft+ (70% Cuerpo)</option>
+                        <option value="HARD">Hard (50% Cuerpo)</option>
+                    </select>
+                </div>
+
+                <div class="result-box">
+                    <div class="row">Entrada Seleccionada: <strong id="cuotaEntradaFinal" class="money">€0.00</strong></div>
+                    <div class="row">Saldo a Financiar: <strong id="cuotaSaldoFinal">€0.00</strong></div>
                 </div>
 
                 <div id="scheduleTable" class="schedule-list">
                     </div>
-                
-                <p class="warning-note">Si falla: Deuda vuelve a Total + Cargos. (Min 2x cuerpos Soft+/Hard).</p>
             </div>
         </div>
-
-    </div>
-</div>
 
 <script src="script.js"></script>
 </body>
