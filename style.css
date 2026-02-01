@@ -24,20 +24,8 @@ body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--
 .rate-card.special { border-left: 3px solid #60a5fa; }
 .rate-card.libre { border-left: 3px solid #f87171; }
 
-/* Etiquetas nuevas (Estaban faltando en tu CSS) */
-.limit-tag {
-    display: inline-block;
-    background: rgba(255,255,255,0.2);
-    padding: 2px 6px;
-    border-radius: 4px;
-    margin: 2px 0;
-    font-size: 0.75rem;
-}
-.cost-tag {
-    color: #fbbf24; /* Ámbar */
-    font-weight: bold;
-    font-size: 0.75rem;
-}
+.limit-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; margin: 2px 0; font-size: 0.75rem; }
+.cost-tag { color: #fbbf24; font-weight: bold; font-size: 0.75rem; }
 
 /* --- 4. PANEL DE CONTROL (INPUTS) --- */
 .control-panel { 
@@ -72,16 +60,15 @@ body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--
 .card.active:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
 
 /* Colores de Borde Superior */
-#cardRefin.active { border-top-color: #8b5cf6; } /* Violeta */
-#cardProrroga.active { border-top-color: #10b981; } /* Verde */
-#cardDescuento.active { border-top-color: #f59e0b; } /* Naranja */
-#cardVacaciones.active { border-top-color: #06b6d4; } /* Cyan */
-#cardCuotas.active { border-top-color: #3b82f6; } /* Azul */
+#cardRefin.active { border-top-color: #8b5cf6; } 
+#cardProrroga.active { border-top-color: #10b981; } 
+#cardDescuento.active { border-top-color: #f59e0b; } 
+#cardVacaciones.active { border-top-color: #06b6d4; } 
+#cardCuotas.active { border-top-color: #3b82f6; } 
 
 .card-header { padding: 15px; font-weight: bold; border-bottom: 1px solid var(--border); background: #f9fafb; border-radius: 10px 10px 0 0; }
 .card-body { padding: 15px; flex-grow: 1; }
 
-/* Texto y Utilidades dentro de tarjetas */
 .status-text { font-size: 0.8rem; color: #6b7280; font-style: italic; margin-bottom: 10px; }
 .money { color: var(--success); font-weight: 800; font-size: 1.2rem; }
 .calc-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.95rem; }
@@ -90,98 +77,35 @@ body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--
 
 .promo-box { background: #fef3c7; padding: 10px; border-radius: 6px; text-align: center; margin-bottom: 10px; }
 .highlight-text { font-size: 1.2rem; font-weight: bold; color: #d97706; }
+.ahorro-tag { background: var(--success); color: white; text-align: center; padding: 5px; border-radius: 20px; font-weight: bold; margin-top: 10px; font-size: 0.9rem; }
 
-.ahorro-tag { 
-    background: var(--success); color: white; text-align: center; padding: 5px; 
-    border-radius: 20px; font-weight: bold; margin-top: 10px; font-size: 0.9rem;
-}
-
-/* --- 6. INPUTS MANUALES Y GRILLAS INTERNAS --- */
-
-/* Inputs pequeños lado a lado */
+/* --- 6. UTILIDADES INTERNAS --- */
 .mini-inputs { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 0.9rem; }
 .mini-inputs input, .mini-inputs select { padding: 5px; border-radius: 4px; border: 1px solid #ccc; }
 
-/* Grilla para cálculos manuales (Prórroga y Vacaciones) */
-.manual-calc-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-/* Corrección para que labels largos quepan en la grilla */
-.manual-calc-grid .mini-inputs {
-    flex-direction: column; /* Texto arriba del input */
-    align-items: flex-start;
-    gap: 4px;
-}
+.manual-calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.manual-calc-grid .mini-inputs { flex-direction: column; align-items: flex-start; gap: 4px; }
 .manual-calc-grid .mini-inputs label { font-size: 0.8rem; white-space: nowrap; }
 .manual-calc-grid .mini-inputs input { width: 100% !important; }
 
-
-/* Botones tipo pastilla (Pills) */
 .option-pill-group { display: flex; gap: 5px; justify-content: space-between; }
-.option-pill { 
-    background: #f3f4f6; padding: 8px; margin-bottom: 5px; border-radius: 4px; 
-    cursor: pointer; text-align: center; border: 1px solid #e5e7eb; transition: 0.2s;
-}
-.option-pill-group .option-pill { flex: 1; margin-bottom: 0; } /* Ajuste para grupos */
+.option-pill { background: #f3f4f6; padding: 8px; margin-bottom: 5px; border-radius: 4px; cursor: pointer; text-align: center; border: 1px solid #e5e7eb; transition: 0.2s; flex: 1; }
 .option-pill:hover { background: #e5e7eb; border-color: #9ca3af; }
 
-
-/* Cajas de Resultados */
 .result-box { background: #ecfdf5; padding: 10px; border-radius: 6px; margin-top: 10px; border: 1px solid #a7f3d0; }
-.fear-box { background: #fef2f2; padding: 10px; border-radius: 6px; margin-top: 10px; border: 1px solid #fecaca; font-size: 0.85rem; }
-
-/* Lista de Cuotas */
-.schedule-list { 
-    max-height: 150px; overflow-y: auto; background: white; border: 1px solid #e5e7eb; 
-    margin-top: 10px; border-radius: 4px; font-size: 0.85rem; 
-}
+.schedule-list { max-height: 150px; overflow-y: auto; background: white; border: 1px solid #e5e7eb; margin-top: 10px; border-radius: 4px; font-size: 0.85rem; }
 .schedule-item { display: flex; justify-content: space-between; padding: 5px 8px; border-bottom: 1px solid #f3f4f6; }
-.schedule-item:last-child { border-bottom: none; }
 
-/* --- 7. TABLA DE REFERENCIA PRÓRROGA (CHIVATA) --- */
-.ref-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 5px;
-    margin-bottom: 5px;
-}
-.ref-item {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
-    padding: 5px;
-    text-align: center;
-    font-size: 0.75rem;
-    display: flex;
-    flex-direction: column;
-}
+/* --- 7. TABLAS Y COMPARATIVAS --- */
+.ref-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 5px; }
+.ref-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 5px; text-align: center; font-size: 0.75rem; display: flex; flex-direction: column; }
 .ref-item strong { color: #334155; }
-.ref-item.low { border-bottom: 2px solid #22c55e; } /* Verde - 5% */
-.ref-item.med { border-bottom: 2px solid #f59e0b; } /* Naranja - 10% */
-.ref-item.high { border-bottom: 2px solid #ef4444; } /* Rojo - 15% */
+.ref-item.low { border-bottom: 2px solid #22c55e; } 
+.ref-item.med { border-bottom: 2px solid #f59e0b; } 
+.ref-item.high { border-bottom: 2px solid #ef4444; } 
 
-
-/* --- ESTILOS NUEVOS PARA VISTAS COMPARATIVAS --- */
-
-/* Contenedor Descuentos */
-.comparison-container {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.option-box {
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    padding: 10px;
-    background: #f8fafc;
-}
-
-/* Colores sutiles para diferenciar fases */
+.comparison-container { display: flex; flex-direction: column; gap: 10px; }
+.option-box { border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; background: #f8fafc; }
 .soft-style { border-left: 4px solid #60a5fa; }
 .softplus-style { border-left: 4px solid #818cf8; }
 .hard-style { border-left: 4px solid #f87171; }
@@ -189,25 +113,75 @@ body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--
 .opt-title { font-size: 0.75rem; font-weight: bold; text-transform: uppercase; color: #475569; margin-bottom: 2px; }
 .opt-desc { font-size: 0.7rem; color: #64748b; font-style: italic; margin-bottom: 5px; }
 .opt-note { font-size: 0.7rem; color: #94a3b8; text-align: center; margin-top: 2px; }
-
 .calc-row-sm { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 2px; }
 .calc-row-center { text-align: center; font-size: 0.9rem; }
 .highlight-val { color: #059669; font-weight: 800; }
 
-/* Grilla de Entradas (Cuotas) */
-.comparison-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 8px;
-}
-.entry-card {
-    background: #fff;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    padding: 8px 4px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-}
+.comparison-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.entry-card { background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 4px; text-align: center; display: flex; flex-direction: column; }
 .entry-card span { font-size: 0.65rem; font-weight: bold; color: #64748b; }
 .entry-card strong { font-size: 0.9rem; color: #1e293b; }
+
+/* --- 8. MODO MANUAL Y SPLIT VIEW (ESTO ES LO NUEVO) --- */
+.manual-mode-switch {
+    background: #f1f5f9;
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: 1px solid #cbd5e1;
+    font-weight: bold;
+    color: #475569;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: 0.2s;
+}
+.manual-mode-switch:hover { background: #e2e8f0; }
+
+/* Contenedor dividido para opciones de cuotas */
+.split-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.plan-option {
+    cursor: pointer;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px;
+    transition: all 0.2s;
+    background: #fff;
+    position: relative;
+}
+
+.plan-option:hover { border-color: #93c5fd; }
+
+/* Radio button posicionado */
+.plan-option input[type="radio"] {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    accent-color: #2563eb;
+}
+
+/* Cuando está seleccionado (funciona en navegadores modernos) */
+.plan-option:has(input:checked) {
+    border-color: #2563eb;
+    background: #eff6ff;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1);
+}
+
+.plan-header {
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #6b7280;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 3px;
+}
+
+.plan-detail { font-size: 0.85rem; margin-bottom: 2px; }
+.text-blue { color: #2563eb; }
+.text-green { color: #059669; }
